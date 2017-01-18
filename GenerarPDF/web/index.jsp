@@ -32,7 +32,7 @@
     </head>
     <body>
         <%
-            response.sendRedirect("/GenerarPDF/FormServlet");
+            response.sendRedirect("/GenerarPDF/pdf");
         %>
         <h1>Hello World!</h1>
         <form name="reporte"  action="">

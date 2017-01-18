@@ -3,6 +3,7 @@ package codigo;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
@@ -17,12 +18,18 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -87,7 +94,8 @@ public class pdf extends HttpServlet {
         listaGeneral.add(datosAcademico);
         listaGeneral.add(modulosCarrera);
         listaGeneral.add(autenticidad);
-        generarPDF(request, response, listaGeneral);
+        //generarPDF(request, response, listaGeneral);
+        openPDF(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -119,7 +127,24 @@ public class pdf extends HttpServlet {
         processRequest(request, response);
     }
 
+    private void openPDF(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        File file = new File("/home/v10x/NetBeansProjects/GeneratorPDF/GenerarPDF/LimitedAccess.pdf");
+        FileInputStream in = new FileInputStream(file);
+        ServletOutputStream out = response.getOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while (true) {
+            len = in.read(buffer);
+            if (len < 0) {
+                break;
+            }
+            out.write(buffer, 0, len);
+        }
+        in.close();
+    }
+
     private void generarPDF(HttpServletRequest request, HttpServletResponse response, LinkedList datos) throws ServletException, IOException {
+
         response.setContentType("application/pdf");
         OutputStream out = response.getOutputStream();
 
@@ -135,7 +160,7 @@ public class pdf extends HttpServlet {
                 Image escudo = Image.getInstance("/home/v10x/NetBeansProjects/GeneratorPDF/GenerarPDF/web/resources/img/EscudoNacional.png");
                 Image sepLogo = Image.getInstance("/home/v10x/NetBeansProjects/GeneratorPDF/GenerarPDF/web/resources/img/sep-logo.png");
                 Image sisBachLogo = Image.getInstance("/home/v10x/NetBeansProjects/GeneratorPDF/GenerarPDF/web/resources/img/sistemaNacBach.png");
-                
+
                 //alineación y tamaño de imagenes
                 escudo.scaleAbsolute(345, 345);
                 escudo.setAbsolutePosition(145, 225);
@@ -144,11 +169,10 @@ public class pdf extends HttpServlet {
                 sisBachLogo.scaleAbsolute(115, 35);
                 sisBachLogo.setAbsolutePosition(430, 250);
 
-                PdfWriter.getInstance(documento, response.getOutputStream());
+                PdfWriter.getInstance(documento, out);
                 documento.open();
                 documento.add(escudo);
                 documento.add(sepLogo);
-               
 
                 Paragraph encabezado = new Paragraph();
                 encabezado.setAlignment(Element.ALIGN_CENTER);
@@ -390,21 +414,21 @@ public class pdf extends HttpServlet {
                 perfil.add(new Phrase("Conforme a los artículos 2, 3, 4 y 6 del Acuerdo 653, los módulos de formación profesional acreditados constituyen el perfil específico del"
                         + "bachillerato tecnológico.", fontTextoQR));
                 documento.add(perfil);
-                
+
                 Paragraph cicloCompetencia = new Paragraph();
                 cicloCompetencia.add(new Phrase("El perfil de competencias aplica a partir del ciclo escolar CICLO de la RIEMS.\n", fontTextoQR));
                 cicloCompetencia.add(new Phrase("Consulte el QR para el despliegue de las competencias.\n\n\n\n\n\n\n\n\n\n", fontTextoQR));
                 cicloCompetencia.setAlignment(Element.ALIGN_RIGHT);
                 documento.add(cicloCompetencia);
                 documento.add(sisBachLogo);
-                Paragraph footAdv= new Paragraph();
+                Paragraph footAdv = new Paragraph();
                 footAdv.add(new Phrase("Con fundamento en lo dispuesto en el artículo 60 de la Ley General de Educación, los certificados de estudios expedidos por instituciones"
                         + " del Sistema Educativo Nacional tienen validez en la República Mexicana sin necesidad de trámites adicionales de autenticación o legalización, lo cual"
                         + " permite el transito del educando por el Sistema Educativo Nacional.\n\n", fontTextoQR));
-                 footAdv.add(new Phrase("La versión electronica del presente documento, su integridad y autoría se podrán comprobar en la página electrónica de CECYTEM, en"
-                         + " la siguiente liga: http://deo.cecytem.mx . De igual manera, se podrá verificar el documento electrónico por medio del código QR.", fontTextoQR));
+                footAdv.add(new Phrase("La versión electronica del presente documento, su integridad y autoría se podrán comprobar en la página electrónica de CECYTEM, en"
+                        + " la siguiente liga: http://deo.cecytem.mx . De igual manera, se podrá verificar el documento electrónico por medio del código QR.", fontTextoQR));
                 documento.add(footAdv);
-                
+
                 documento.close();
 
             } catch (Exception ex) {
