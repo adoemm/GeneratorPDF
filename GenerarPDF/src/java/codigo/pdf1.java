@@ -9,6 +9,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
@@ -20,11 +21,16 @@ public class pdf1 {
     
     
     
-    public static void main(String[] args) {
-        new pdf1().creaPDF();
+    public static void main(String[] args) throws FileNotFoundException {
+         
+        //new pdf1().creaPDF();
+        
 }
     
-    
+    public void imprime()
+    {
+        System.out.println("Desde pdf1");
+    }
     public void creaPDF ()
     {
          try {
@@ -32,8 +38,8 @@ public class pdf1 {
                 "LimitedAccess.pdf"));
         
         Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, file);
- 
+        PdfWriter.getInstance(document, file);
+       
       
  
         document.open();
@@ -45,6 +51,8 @@ public class pdf1 {
         e.printStackTrace();
     }
     }
+    
+    
 
 
 }
