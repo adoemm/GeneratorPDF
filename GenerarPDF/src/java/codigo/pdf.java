@@ -1,5 +1,6 @@
 package codigo;
 
+import static Test.testEncryption.OWNER;
 import Test.testOutputStream;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -56,6 +57,8 @@ public class pdf extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    public static byte[] OWNER = "Cecytem".getBytes();
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LinkedList listaGeneral, datosPlantel, datosAlumno, datosAcademico, modulosCarrera, autenticidad;
@@ -136,7 +139,7 @@ public class pdf extends HttpServlet {
     private void openPDF(HttpServletRequest request, HttpServletResponse response, String file) throws IOException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PdfReader reader = new PdfReader(file);
+        PdfReader reader = new PdfReader(file, OWNER);
         PdfStamper stamper = null;
         try {
             stamper = new PdfStamper(reader, baos);
@@ -166,12 +169,13 @@ public class pdf extends HttpServlet {
         LinkedList datosAcademico = (LinkedList) datos.get(2);
         LinkedList modulos = (LinkedList) datos.get(3);
         LinkedList autenticidad = (LinkedList) datos.get(4);
+        
         //Archivo a Abrir.
         String fileName = getServletContext().getRealPath("CE-" + datosAcademico.get(1));
         OutputStream file = new FileOutputStream(fileName);
         //Creando el documento.
         Document documento = new Document(PageSize.LETTER, 38, 38, 38, 38);
-
+        
         try {
             //Imagenes y Figuras.
             Image escudo = Image.getInstance("/home/v10x/NetBeansProjects/GeneratorPDF/GenerarPDF/web/resources/img/EscudoNacional.png");
@@ -187,6 +191,7 @@ public class pdf extends HttpServlet {
             sisBachLogo.setAbsolutePosition(430, 250);
             //Asignando Instancia de documento a PDF.   
             PdfWriter pdf = PdfWriter.getInstance(documento, file);
+            pdf.setEncryption(null, OWNER, PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
             documento.open();
             //Asignando Metadatos.
             documento.addTitle("CECYTEM-CE-" + datosAcademico.get(1));
